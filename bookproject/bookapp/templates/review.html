@@ -1,0 +1,86 @@
+<html>
+    <header>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    </header>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container px-4 px-lg-5">
+                <a class="navbar-brand" href="{% url 'home' %}">Book Trace</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a></li>
+                        {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'mybook' %}">MyBook</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'search' %}">Search</a></li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Shop</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="#!">All Products</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li><a class="dropdown-item" href="#!">Popular Items</a></li>
+                                <li><a class="dropdown-item" href="#!">New Arrivals</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                    {% if user.is_authenticated %}
+                        {{ user.username }}님 안녕하세요! &nbsp; &nbsp;
+                    {% else %}
+                    <a class="small" href="{% url 'signup' %}">Create an Account!</a>
+                    {% endif %}
+                    <form class="d-flex">
+                        {% if user.is_authenticated %}
+                            <button class="btn btn-outline-dark">
+                            <i class="bi bi-door-open-fill"></i>
+                            <a href="{% url 'logout' %}">Logout</a>
+                            </button>
+                        {% else %}
+                            <button class="btn btn-outline-dark">
+                            <i class="bi bi-door-open-fill"></i>
+                            <a href="{% url 'login' %}">Login</a>
+                            </button>
+                        {% endif %}
+                        
+                    </form>
+                </div>
+            </div>
+        </nav>
+        <br>
+        <div class="container">
+            {% for comment in book_detail.comment_set.all %}
+            <span class="badge rounded-pill bg-light" style="color:black">{{ comment.date}}</span>    
+            {{ comment }}
+            
+            
+            <span style="float:right;">
+                {% if user == comment.user %}
+                <a href="{% url 'reviewdelete' comment.id %}"><span class="badge rounded-pill bg-black" style="float: left;">삭제</span></a>
+                <a href="{% url 'reviewedit' comment.id %}"><span class="badge rounded-pill bg-black" style="float: left;">수정</span></a>
+                &nbsp;|&nbsp;
+                {% endif %}
+                <span style="float: right;">{{ comment.writer }}</span>
+
+            </span>
+            
+            
+            
+            <hr>
+            {% endfor %}
+            <form method="POST" action="{% url 'create_comment' book_detail.id %}">
+            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                <div class="text-left">
+                    {% csrf_token %}
+                    {{ comment_form }}
+                    <button type="submit" class="btn btn-outline-dark mt-auto">리뷰 쓰기</button>
+                </div>
+            </div>
+            </form>
+            <div class="text-end">
+                <a href="{% url 'detail' book_detail.id %}"><button class="btn btn-outline-dark mt-auto" >돌아가기</button></a>
+            </div>
+        </div>
+    </body>
+</html>
